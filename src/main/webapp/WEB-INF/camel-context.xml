@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+       
+        <bean id="dataSet" class="org.apache.camel.component.dataset.SimpleDataSet">
+                <property name="defaultBody" value=""/>
+                <property name="size" value="1"/>
+        </bean>
+    
+	<camelContext id="camelContext" xmlns="http://camel.apache.org/schema/spring">
+		<jmxAgent id="agent" disabled="true" />
+	     
+		<intercept>
+			<to uri="log:interceptor"/>
+		</intercept>	
+		
+		<!-- hello -->
+		<route>
+			<from uri="servlet:///hello"/>
+			<setBody><simple>Hello Camel</simple></setBody>			
+		</route>
+		
+		<!-- process data -->
+		<route>
+			<from uri="gtask://default"/>
+			<to uri="direct:clear"/>
+			<to uri="ghttp://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/B295/295_6356_6380/A"/>
+			<to uri="direct:add"/>
+			<to uri="ghttp://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/B194/194_6079_6126/A"/>
+			<to uri="direct:add"/>
+			<to uri="ghttp://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/B295/295_6356_6380/R"/>
+			<to uri="direct:add"/>
+			<to uri="ghttp://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/B194/194_6079_6126/R"/>
+			<to uri="direct:add"/>
+			<to uri="ghttp://www.ratp.fr/horaires/fr/ratp/rer/prochains_passages/RB/Fontenay+aux+Roses/A"/>
+			<to uri="direct:add"/>
+			<to uri="ghttp://www.ratp.fr/horaires/fr/ratp/rer/prochains_passages/RB/Fontenay+aux+Roses/R"/>
+			<to uri="direct:add"/>
+		</route>
+		<route>
+			<from uri="direct:clear"/>
+			<setBody><constant></constant></setBody>			
+			<bean ref="dataSet" method="setDefaultBody"/>
+		</route>
+		<route>
+			<from uri="direct:add"/>
+			<unmarshal>
+				<tidyMarkup/>
+			</unmarshal>
+			<setBody><simple>&lt;root&gt;$${bean:dataSet?method=getDefaultBody}${body}&lt;/root&gt;</simple></setBody>
+			<bean ref="dataSet" method="setDefaultBody"/>
+		</route>
+		
+		<!-- servlet endpoint -->
+		<route>
+			<from uri="servlet:///refresh"/>
+			<setBody><constant></constant></setBody>			
+			<to uri="gtask://default"/>
+			<convertBodyTo type="java.lang.String"/>
+		</route>
+		<route>
+			<from uri="servlet:///get"/>
+			<choice>
+			<when>
+				<simple>"${bean:dataSet?method=getDefaultBody}"=""</simple>
+				<setBody><constant></constant></setBody>			
+				<to uri="gtask://default"/>
+			</when>
+			</choice>			
+						
+			<setBody><simple>${bean:dataSet?method=getDefaultBody}</simple></setBody>			
+			<setBody><xquery  type="java.lang.String">(//*:fieldset//*:div | //*:fieldset//*:tr)/concat("&lt;tr style='background-color: silver'&gt;&lt;td&gt;",(*:img[last()-1]/@alt|*:td[last()-1]/text()),"&lt;/td&gt;&lt;td&gt;",(*:img[last()]/@alt|*:td[last()]/text()),"&lt;/td&gt;&lt;/tr&gt;")</xquery></setBody>
+			<setBody><simple>&lt;html&gt;&lt;body&gt;&lt;table&gt;${body}&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</simple></setBody>			
+		</route>
+	</camelContext>
+</beans>			
