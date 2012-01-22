@@ -9,20 +9,23 @@
                 <property name="defaultBody" value=""/>
                 <property name="size" value="1"/>
         </bean>
-    
+	
 	<camelContext id="camelContext" xmlns="http://camel.apache.org/schema/spring">
 		<jmxAgent id="agent" disabled="true" />
-	     
-		<intercept>
-			<to uri="log:interceptor?showHeaders=true"/>
-		</intercept>	
-		
+
 		<!-- hello -->
 		<route>
 			<from uri="servlet:///"/>
-			<setBody><simple>Hello Camel</simple></setBody>			
+			<setBody><simple>Hello Camel</simple></setBody>
 		</route>
-		
+
+		<!-- mail -->
+		<route>
+			<from uri="servlet://notification?matchOnUriPrefix=true"/>
+			<to uri="log:mail"/>
+			<setBody><simple>Hello Camel</simple></setBody>
+		</route>
+
 		<!-- process data -->
 		<route>
 			<from uri="gtask://default"/>
@@ -64,12 +67,16 @@
 				<header>target</header>
 			</recipientList>				
 			<to uri="direct:extractData"/>
+			<to uri="direct:concatData"/>
 		</route>
 		<route>
 			<from uri="direct:extractData"/>
 			<unmarshal>
 				<tidyMarkup/>
 			</unmarshal>
+			<setBody>
+				<xquery>//*:fieldset</xquery>				
+			</setBody>
 			<setBody>
 				<xquery  type="java.lang.String">
 					for $item in (//*:fieldset//*:div[@class="line_details"] | //*:fieldset//*:tr)
@@ -78,7 +85,6 @@
 						else concat("&lt;tr style='background-color: silver'&gt;&lt;td&gt;",$item/*:td[last()-1]/text(),"&lt;/td&gt;&lt;td&gt;",$item/*:td[last()]/text(),"&lt;/td&gt;&lt;/tr&gt;")
 				</xquery>
 			</setBody>
-			<to uri="direct:concatData"/>
 		</route>
 		<route>
 			<from uri="direct:concatData"/>
@@ -91,7 +97,34 @@
 			<setBody><simple>&lt;html&gt;&lt;body&gt;&lt;table&gt;${body}&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</simple></setBody>			
 		</route>
 		
+		<route>
+			<from uri="direct:getStationList"/>
+			<setHeader headerName="CamelHttpMethod"><constant>POST</constant></setHeader>			
+			<setBody><simple>busLigneServiceForm%5Bline%5D=${header.line}&amp;busLigneServiceForm%5Bservice%5D=PP</simple></setBody>			
+			<to uri="ghttp://www.ratp.fr/horaires/fr/ratp/bus"/>
+			<unmarshal>
+				<tidyMarkup/>
+			</unmarshal>
+			<setBody>
+				<xquery  type="java.lang.String">
+					//*:fieldset//*:option/concat("&lt;item key=&amp;#34;" ,@value, "&amp;#34; value=&amp;#34;" ,text(), "&amp;#34; /&gt;")
+				</xquery>
+			</setBody>
+			<setBody><simple>&lt;root&gt;${body}&lt;/root&gt;</simple></setBody>		
+		</route>
+		
 		<!-- servlet endpoint -->
+		<route>
+			<from uri="servlet:///test"/>
+			<to uri="ghttp://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/B194/194_6079_6126/R"/>
+		</route>
+		<route>
+			<from uri="servlet:///testtidy"/>
+			<to uri="ghttp://www.google.com?bridgeEndpoint=true"/>
+			<unmarshal>
+				<tidyMarkup/>
+			</unmarshal>
+		</route>
 		<route>
 			<from uri="servlet:///get"/>
 			<to uri="direct:getInfo"/>						
@@ -108,18 +141,7 @@
 		</route>
 		<route>
 			<from uri="servlet:///getStationList"/>
-			<setHeader headerName="CamelHttpMethod"><constant>POST</constant></setHeader>			
-			<setBody><simple>busLigneServiceForm%5Bline%5D=${header.line}&amp;busLigneServiceForm%5Bservice%5D=PP</simple></setBody>			
-			<to uri="ghttp://www.ratp.fr/horaires/fr/ratp/bus"/>
-			<unmarshal>
-				<tidyMarkup/>
-			</unmarshal>
-			<setBody>
-				<xquery  type="java.lang.String">
-					//*:fieldset//*:option/concat("&lt;item key=&amp;#34;" ,@value, "&amp;#34; value=&amp;#34;" ,text(), "&amp;#34; /&gt;")
-				</xquery>
-			</setBody>
-			<setBody><simple>&lt;root&gt;${body}&lt;/root&gt;</simple></setBody>			
+			<to uri="direct:getStationList"/>
 			<setBody>
 				<xquery  type="java.lang.String">
 					for $item in //item 
@@ -131,18 +153,7 @@
 		<route>
 			<from uri="servlet:///getNextTime"/>
 			<to uri="direct:clear"/>
-			<setHeader headerName="CamelHttpMethod"><constant>POST</constant></setHeader>			
-			<setBody><simple>busLigneServiceForm%5Bline%5D=${header.line}&amp;busLigneServiceForm%5Bservice%5D=PP</simple></setBody>			
-			<to uri="ghttp://www.ratp.fr/horaires/fr/ratp/bus"/>
-			<unmarshal>
-				<tidyMarkup/>
-			</unmarshal>
-			<setBody>
-				<xquery  type="java.lang.String">
-					//*:fieldset//*:option/concat("&lt;item key=&amp;#34;" ,@value, "&amp;#34; value=&amp;#34;" ,text(), "&amp;#34; /&gt;")
-				</xquery>
-			</setBody>
-			<setBody><simple>&lt;root&gt;${body}&lt;/root&gt;</simple></setBody>			
+			<to uri="direct:getStationList"/>
 			<split>
 				<xpath>//item/@key</xpath>
 				<setBody><simple>ghttp://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/${header.line}/${body}/A</simple></setBody>			

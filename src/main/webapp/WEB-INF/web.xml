@@ -39,4 +39,18 @@
         <servlet-name>CamelServlet</servlet-name>
         <url-pattern>/worker/*</url-pattern>
     </servlet-mapping>    
+    
+    <!-- mail handler -->
+	<servlet-mapping>
+	  <servlet-name>CamelServlet</servlet-name>
+	  <url-pattern>/_ah/mail/*</url-pattern>
+	</servlet-mapping>
+	<security-constraint>
+	  <web-resource-collection>
+	    <url-pattern>/_ah/mail/*</url-pattern>
+	  </web-resource-collection>
+	  <auth-constraint>
+	    <role-name>admin</role-name>
+	  </auth-constraint>
+	</security-constraint>    
 </web-app>

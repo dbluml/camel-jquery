@@ -13,6 +13,7 @@ package test;
 
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import wicket.contrib.gmap.GMap2;
 
 /** Page is responsible of
  * @author rhansen@kindleit.net
@@ -22,6 +23,7 @@ public class HomePage extends WebPage {
 
   public HomePage() {
     add(new Label("hello", "Hello Wicket"));
+    add(new GMap2("gmap","ABQIAAAAMOTASLIpQ8dhFWFg0eBQHRSj5mCQuQolMUxXcCrL8TLyG1TK7RRIlI3nDqvrnwX_-SPxR1Y75ejaUA"));
   }
 
 }
