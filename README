@@ -1,0 +1,3 @@
+mvn gae:deploy 
+	deploy to Goggle App Engine http://busapaname.appspot.com
+	
