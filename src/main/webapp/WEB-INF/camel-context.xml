@@ -15,15 +15,18 @@
 
 		<!-- hello -->
 		<route>
-			<from uri="servlet:///"/>
+			<from uri="servlet:///hello"/>
 			<setBody><simple>Hello Camel</simple></setBody>
 		</route>
 
 		<!-- mail -->
 		<route>
-			<from uri="servlet://notification?matchOnUriPrefix=true"/>
+			<from uri="servlet:///mail?matchOnUriPrefix=true"/>
 			<to uri="log:mail"/>
-			<setBody><simple>Hello Camel</simple></setBody>
+			<setHeader headerName="target"><simple>gmail://camelforwarder123@gmail.com?to=mail@busapaname.appspotmail.com&amp;subject=forward</simple></setHeader>
+			<recipientList>
+				<header>target</header>
+			</recipientList>	
 		</route>
 
 		<!-- process data -->
@@ -112,7 +115,7 @@
 			</setBody>
 			<setBody><simple>&lt;root&gt;${body}&lt;/root&gt;</simple></setBody>		
 		</route>
-		
+
 		<!-- servlet endpoint -->
 		<route>
 			<from uri="servlet:///test"/>
@@ -132,12 +135,10 @@
 		<route>
 			<from uri="servlet:///post"/>
 			<to uri="direct:getInfo"/>
-			<setHeader headerName="GMailBindingGmailTo"><simple>to=${header.to}&amp;subject=${header.subject}</simple></setHeader>			
-			<to uri="gmail://michel.promonet.1@gmail.com"/>						
-		</route>
-		<route>
-			<from uri="servlet:///smtp2web?matchOnUriPrefix=true"/>
-			<to uri="gmail://michel.promonet.1@gmail.com?to=camelforwarder123@gmail.com&amp;subject=forward"/>						
+			<setHeader headerName="target"><simple>gmail://${header.from}?to=${header.to}&amp;subject=${header.subject}</simple></setHeader>
+			<recipientList>
+				<header>target</header>
+			</recipientList>	
 		</route>
 		<route>
 			<from uri="servlet:///getStationList"/>
