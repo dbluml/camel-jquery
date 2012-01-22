@@ -23,7 +23,7 @@
 		<route>
 			<from uri="servlet:///mail?matchOnUriPrefix=true"/>
 			<to uri="log:mail"/>
-			<setHeader headerName="target"><simple>gmail://camelforwarder123@gmail.com?to=mail@busapaname.appspotmail.com&amp;subject=forward</simple></setHeader>
+			<setHeader headerName="target"><simple>gmail://michel.promonet.1@gmail.com?to=mail@busapaname.appspotmail.com&amp;subject=forward</simple></setHeader>
 			<recipientList>
 				<header>target</header>
 			</recipientList>	
@@ -135,7 +135,7 @@
 		<route>
 			<from uri="servlet:///post"/>
 			<to uri="direct:getInfo"/>
-			<setHeader headerName="target"><simple>gmail://${header.from}?to=${header.to}&amp;subject=${header.subject}</simple></setHeader>
+			<setHeader headerName="target"><simple>gmail://michel.promonet.1@gmail.com?to=${header.to}&amp;subject=${header.subject}</simple></setHeader>
 			<recipientList>
 				<header>target</header>
 			</recipientList>	
