@@ -4,68 +4,37 @@
 
   <!-- The Basics -->
   <groupId>test</groupId>
-  <artifactId>camel-gae-wicket-test</artifactId>
+  <artifactId>camel-cloubbee-wicket-test</artifactId>
   <version>0.0.0</version>
   <packaging>war</packaging>
 
   <name>busapaname</name>
 
+<pluginRepositories>
+  <pluginRepository>
+    <id>cloudbees-public-release</id>
+    <url>http://repository-cloudbees.forge.cloudbees.com/public-release</url>
+    <releases>
+      <enabled>true</enabled>
+    </releases>
+    <snapshots>
+      <enabled>false</enabled>
+    </snapshots>
+   </pluginRepository>
+</pluginRepositories>
+
   <properties>
-    <!-- Sets the project's default encoding. 
-         http://docs.codehaus.org/display/MAVENUSER/POM+Element+for+Source+File+Encoding -->
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    
-    <!-- gae settings -->
-    <gae.application.version>test</gae.application.version>
-    <gae.version>1.6.1</gae.version>
-    <gae.home>${settings.localRepository}/com/google/appengine/appengine-java-sdk/${gae.version}/appengine-java-sdk-${gae.version}</gae.home>
-    <gae.plugins.version>0.9.2</gae.plugins.version>
-    <gae.port>9090</gae.port>
-    
+
+   <bees.key>5F94749DEEB1D22E</bees.key>
+   <bees.secret>YASIALLPNTEUJBJ7L1KXBWTVOJ6OF6TH0272XHFT43S=</bees.secret>
+           
     <!-- versions -->
     <wicket.version>1.4.19</wicket.version>
     <mail.version>1.4</mail.version>
-    <camel.version>2.8.0</camel.version>
+    <camel.version>2.9.2</camel.version>
     <spring.version>3.1.0.RELEASE</spring.version>
     <sl4j.version>1.6.3</sl4j.version>
   </properties>
-
-  <profiles>
-    <!--
-      We can configure our integration server to activate this profile and
-      perform gae:deploy, thus uploading latest snapshot to the
-      http://1.latest.<applicationName>.appspot.com automatically
-    -->
-    <profile>
-      <id>integration-build</id>
-      <properties>
-        <gae.application.version>stage</gae.application.version>
-      </properties>
-    </profile>
-
-    <!--
-      This profile will activate automatically during release and upload
-      application to the http://2.latest.<applicationName>.appspot.com (We
-      might want to set the 2nd version as our applications Default version
-      to be accessible at http://<applicationName>.appspot.com)
-    -->
-    <profile>
-      <id>release-build</id>
-      <activation>
-        <property>
-          <name>performRelease</name>
-          <value>true</value>
-        </property>
-      </activation>
-
-      <properties>
-        <!--
-          During release, set application version in appengine-web.xml to 2
-        -->
-        <gae.application.version>release</gae.application.version>
-      </properties>
-    </profile>
-  </profiles>
 
   <dependencies>
 	<!-- wicket-->
@@ -106,6 +75,11 @@
 		<artifactId>spring-web</artifactId>
 		<version>${spring.version}</version>
 	</dependency>    
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-jdbc</artifactId>
+		<version>${spring.version}</version>
+	</dependency>    
 
     <!-- camel -->
     <dependency>
@@ -135,47 +109,16 @@
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
-      <artifactId>camel-gae</artifactId>
+      <artifactId>camel-jdbc</artifactId>
       <version>${camel.version}</version>
     </dependency>
     
   </dependencies>
 
   <build>
-   <defaultGoal>gae:run</defaultGoal>
+   <defaultGoal>bees:deploy</defaultGoal>
   
     <plugins>
-      <!--
-        The actual maven-gae-plugin. Type "mvn gae:run" to run project, "mvn gae:update"
-        to upload to GAE.
-      -->
-      <plugin>
-        <groupId>net.kindleit</groupId>
-        <artifactId>maven-gae-plugin</artifactId>
-        <version>${gae.plugins.version}</version>
-        <configuration>
-          <sdkDir>${gae.home}</sdkDir>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>net.kindleit</groupId>
-            <artifactId>gae-runtime</artifactId>
-            <version>${gae.version}</version>
-            <type>pom</type>
-          </dependency>
-        </dependencies>
-      </plugin>
-
-      <!--
-        Upload application to the appspot automatically, during release:perform
-      -->
-      <plugin>
-        <artifactId>maven-release-plugin</artifactId>
-        <configuration>
-          <goals>gae:deploy</goals>
-        </configuration>
-      </plugin>
-
       <!-- Java compiler version -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -186,6 +129,13 @@
           <target>1.6</target>
         </configuration>
       </plugin>
+
+      <!-- coloudbees -->
+    <plugin>
+      <groupId>com.cloudbees</groupId>
+      <artifactId>bees-maven-plugin</artifactId>
+      <version>1.3.2</version>
+    </plugin>
       
     </plugins>
   </build>

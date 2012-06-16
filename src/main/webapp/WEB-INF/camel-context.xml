@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc" 
+       xsi:schemaLocation="http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+					 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+					 http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd ">
        
         <bean id="dataSet" class="org.apache.camel.component.dataset.SimpleDataSet">
                 <property name="defaultBody" value=""/>
                 <property name="size" value="1"/>
         </bean>
 	
-	<camelContext id="camelContext" xmlns="http://camel.apache.org/schema/spring">
-		<jmxAgent id="agent" disabled="true" />
+	<bean id="datasource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+	    <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+	    <property name="url" value="jdbc:mysql://ec2-75-101-156-134.compute-1.amazonaws.com:3306/mpromonet" />
+	    <property name="username" value="mic672@msn.com" />
+	    <property name="password" value="mic672@msn.com" />
+	</bean>
 
+	<camelContext id="camelContext" xmlns="http://camel.apache.org/schema/spring">
 		<!-- hello -->
 		<route>
 			<from uri="servlet:///hello"/>
@@ -31,31 +37,35 @@
 
 		<!-- process data -->
 		<route>
-			<from uri="gtask://default"/>
+			<from uri="timer://default?period=5000"/>
 			<to uri="direct:query"/>
+			<setBody>
+				<simple>insert events set msg='${body}'</simple>
+			</setBody>			
+			<to uri="jdbc:datasource"/>
 		</route>
 		<route>
 			<from uri="direct:query"/>
 			<to uri="direct:clear"/>
-			<setBody><constant>ghttp://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/B295/295_6356_6380/A</constant></setBody>
+			<setBody><constant>http://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/B295/295_6356_6380/A</constant></setBody>
 			<to uri="direct:fetchURL"/>
-			<setBody><constant>ghttp://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/B194/194_6079_6126/A</constant></setBody>
+			<setBody><constant>http://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/B194/194_6079_6126/A</constant></setBody>
 			<to uri="direct:fetchURL"/>
-			<setBody><constant>ghttp://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/B295/295_6356_6380/R</constant></setBody>
+			<setBody><constant>http://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/B295/295_6356_6380/R</constant></setBody>
 			<to uri="direct:fetchURL"/>
-			<setBody><constant>ghttp://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/B194/194_6079_6126/R</constant></setBody>
+			<setBody><constant>http://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/B194/194_6079_6126/R</constant></setBody>
 			<to uri="direct:fetchURL"/>
-			<setBody><constant>ghttp://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/B162/162_57_93/A</constant></setBody>			
+			<setBody><constant>http://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/B162/162_57_93/A</constant></setBody>			
 			<to uri="direct:fetchURL"/>
-			<setBody><constant>ghttp://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/B162/162_57_93/R</constant></setBody>			
+			<setBody><constant>http://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/B162/162_57_93/R</constant></setBody>			
 			<to uri="direct:fetchURL"/>
-			<setBody><constant>ghttp://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/B394/394_6142_6164/A</constant></setBody>
+			<setBody><constant>http://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/B394/394_6142_6164/A</constant></setBody>
 			<to uri="direct:fetchURL"/>
-			<setBody><constant>ghttp://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/B394/394_6142_6164/R</constant></setBody>
+			<setBody><constant>http://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/B394/394_6142_6164/R</constant></setBody>
 			<to uri="direct:fetchURL"/>
-			<setBody><constant>ghttp://www.ratp.fr/horaires/fr/ratp/rer/prochains_passages/RB/Fontenay+aux+Roses/A</constant></setBody>
+			<setBody><constant>http://www.ratp.fr/horaires/fr/ratp/rer/prochains_passages/RB/Fontenay+aux+Roses/A</constant></setBody>
 			<to uri="direct:fetchURL"/>
-			<setBody><constant>ghttp://www.ratp.fr/horaires/fr/ratp/rer/prochains_passages/RB/Fontenay+aux+Roses/R</constant></setBody>
+			<setBody><constant>http://www.ratp.fr/horaires/fr/ratp/rer/prochains_passages/RB/Fontenay+aux+Roses/R</constant></setBody>
 			<to uri="direct:fetchURL"/>
 		</route>
 		<route>
@@ -102,9 +112,10 @@
 		
 		<route>
 			<from uri="direct:getStationList"/>
+			<removeHeaders pattern="CamelHttp*"/>
 			<setHeader headerName="CamelHttpMethod"><constant>POST</constant></setHeader>			
 			<setBody><simple>busLigneServiceForm%5Bline%5D=${header.line}&amp;busLigneServiceForm%5Bservice%5D=PP</simple></setBody>			
-			<to uri="ghttp://www.ratp.fr/horaires/fr/ratp/bus"/>
+			<to uri="http://www.ratp.fr/horaires/fr/ratp/bus"/>
 			<unmarshal>
 				<tidyMarkup/>
 			</unmarshal>
@@ -116,18 +127,35 @@
 			<setBody><simple>&lt;root&gt;${body}&lt;/root&gt;</simple></setBody>		
 		</route>
 
-		<!-- servlet endpoint -->
+		<!-- servlet endpoint to datasource -->
 		<route>
-			<from uri="servlet:///test"/>
-			<to uri="ghttp://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/B194/194_6079_6126/R"/>
+			<from uri="servlet:///values"/>
+			<setBody>
+				<constant>select * from events</constant>
+			</setBody>			
+			<filter><simple>${header.where}</simple>
+				<setBody>
+					<simple>${body} where ${header.where}</simple>
+				</setBody>
+			</filter>			
+			<to uri="jdbc:datasource"/>
 		</route>
 		<route>
-			<from uri="servlet:///testtidy"/>
-			<to uri="ghttp://www.google.com?bridgeEndpoint=true"/>
-			<unmarshal>
-				<tidyMarkup/>
-			</unmarshal>
+			<from uri="servlet:///schema"/>
+			<setBody>
+				<constant>describe events</constant>
+			</setBody>			
+			<to uri="jdbc:datasource"/>
 		</route>
+		<route>
+			<from uri="servlet:///insert"/>
+			<setBody>
+				<simple>insert events set msg='${header.msg}'</simple>
+			</setBody>			
+			<to uri="jdbc:datasource"/>
+		</route>
+		
+		<!-- servlet endpoint  -->
 		<route>
 			<from uri="servlet:///get"/>
 			<to uri="direct:getInfo"/>						
@@ -157,7 +185,7 @@
 			<to uri="direct:getStationList"/>
 			<split>
 				<xpath>//item/@key</xpath>
-				<setBody><simple>ghttp://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/${header.line}/${body}/A</simple></setBody>			
+				<setBody><simple>http://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/${header.line}/${body}/A</simple></setBody>			
 				<to uri="direct:fetchURL"/>
 			</split>
 			<setBody><simple>${bean:dataSet?method=getDefaultBody}</simple></setBody>			

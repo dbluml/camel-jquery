@@ -24,15 +24,6 @@
 		<servlet-name>CamelServlet</servlet-name>
 		<url-pattern>/camel/*</url-pattern>
 	</servlet-mapping> 
-    <!-- google login needed to send mail -->
-	<security-constraint>
-	  <web-resource-collection>
-	    <url-pattern>/camel/post?*</url-pattern>
-	  </web-resource-collection>
-	  <auth-constraint>
-	    <role-name>admin</role-name>
-	  </auth-constraint>
-	</security-constraint>    
 	
 	<!-- Initialize spring context -->
 	<listener>
@@ -42,25 +33,5 @@
 	    <param-name>contextConfigLocation</param-name>
 	    <param-value>WEB-INF/camel-context.xml</param-value>
 	</context-param>
-	
-    <!-- Mapping used for web hooks accessed by task queueing service. -->
-    <servlet-mapping>
-        <servlet-name>CamelServlet</servlet-name>
-        <url-pattern>/worker/*</url-pattern>
-    </servlet-mapping>    
-    
-    <!-- mail handler -->
-	<servlet-mapping>
-	  <servlet-name>CamelServlet</servlet-name>
-	  <url-pattern>/_ah/*</url-pattern>
-	</servlet-mapping>
-	<security-constraint>
-	  <web-resource-collection>
-	    <url-pattern>/_ah/*</url-pattern>
-	  </web-resource-collection>
-	  <auth-constraint>
-	    <role-name>admin</role-name>
-	  </auth-constraint>
-	</security-constraint>    
-		
+			
 </web-app>
