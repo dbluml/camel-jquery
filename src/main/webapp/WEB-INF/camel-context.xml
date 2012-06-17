@@ -30,16 +30,6 @@
 			<setBody><simple>Hello Camel</simple></setBody>
 		</route>
 
-		<!-- mail -->
-		<route>
-			<from uri="servlet:///mail?matchOnUriPrefix=true"/>
-			<to uri="log:mail"/>
-			<setHeader headerName="target"><simple>gmail://michel.promonet.1@gmail.com?to=mail@busapaname.appspotmail.com&amp;subject=forward</simple></setHeader>
-			<recipientList>
-				<header>target</header>
-			</recipientList>	
-		</route>
-
 		<!-- process data -->
 		<route>
 			<from uri="timer://default?period=5000"/>
@@ -188,7 +178,7 @@
 		<route>
 			<from uri="servlet:///post"/>
 			<to uri="direct:getInfo"/>
-			<setHeader headerName="target"><simple>gmail://michel.promonet.1@gmail.com?to=${header.to}&amp;subject=${header.subject}</simple></setHeader>
+			<setHeader headerName="target"><simple>smtp://cloudbees_mpromonet@smtp.sendgrid.net?password=mic672@msn.com&amp;to=${header.to}&amp;subject=${header.subject}</simple></setHeader>
 			<recipientList>
 				<header>target</header>
 			</recipientList>	
