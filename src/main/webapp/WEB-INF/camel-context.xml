@@ -10,9 +10,8 @@
                 <property name="defaultBody" value=""/>
                 <property name="size" value="1"/>
         </bean>
-	
-        <bean id="dbProperties"
-                class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+
+        <bean id="dbProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
                 <property name="location" value="classpath:db.properties" />
                 <property name="ignoreUnresolvablePlaceholders" value="true" />
         </bean>
@@ -45,10 +44,6 @@
 		<route>
 			<from uri="timer://default?period=5000"/>
 			<to uri="direct:query"/>
-			<setBody>
-				<simple>insert events set msg='${body}'</simple>
-			</setBody>			
-			<to uri="jdbc:datasource"/>
 		</route>
 		<route>
 			<from uri="direct:query"/>
@@ -107,6 +102,7 @@
 		</route>
 		<route>
 			<from uri="direct:concatData"/>
+			<to uri="direct:insert"/>
 			<setBody><simple>${bean:dataSet?method=getDefaultBody}${body}</simple></setBody>
 			<bean ref="dataSet" method="setDefaultBody"/>
 		</route>
@@ -133,6 +129,15 @@
 			<setBody><simple>&lt;root&gt;${body}&lt;/root&gt;</simple></setBody>		
 		</route>
 
+		<!-- dataccess-->
+		<route>
+			<from uri="direct:insert"/>			
+			<setBody>
+				<simple>insert events set msg="${body}"</simple>
+			</setBody>			
+			<to uri="jdbc:datasource"/>
+		</route>
+		
 		<!-- servlet endpoint to datasource -->
 		<route>
 			<from uri="servlet:///values"/>
@@ -154,13 +159,27 @@
 			<to uri="jdbc:datasource"/>
 		</route>
 		<route>
-			<from uri="servlet:///insert"/>
+			<from uri="servlet:///insert"/>			
 			<setBody>
-				<simple>insert events set msg='${header.msg}'</simple>
+				<simple>${header.msg}</simple>
+			</setBody>			
+			<to uri="direct:insert"/>
+		</route>
+		<route>
+			<from uri="servlet:///droptable"/>
+			<setBody>
+				<constant>drop table events</constant>
 			</setBody>			
 			<to uri="jdbc:datasource"/>
 		</route>
-		
+		<route>
+			<from uri="servlet:///createtable"/>
+			<setBody>
+				<constant>create table events (id integer key not null auto_increment,msg varchar(4096))</constant>
+			</setBody>			
+			<to uri="jdbc:datasource"/>
+		</route>
+			
 		<!-- servlet endpoint  -->
 		<route>
 			<from uri="servlet:///get"/>
