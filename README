@@ -1,3 +1,4 @@
-mvn gae:deploy 
-	deploy to Goggle App Engine http://busapaname.appspot.com
+mvn bee:run	run localy in embedded tomcat
+
+mvn bee:deploy	deploy to cloudbees to http://busapaname.mpromonet.cloudbees.net
 	

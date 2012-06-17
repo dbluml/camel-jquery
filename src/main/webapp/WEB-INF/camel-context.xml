@@ -11,11 +11,17 @@
                 <property name="size" value="1"/>
         </bean>
 	
+        <bean id="dbProperties"
+                class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+                <property name="location" value="classpath:db.properties" />
+                <property name="ignoreUnresolvablePlaceholders" value="true" />
+        </bean>
+
 	<bean id="datasource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-	    <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-	    <property name="url" value="jdbc:mysql://ec2-75-101-156-134.compute-1.amazonaws.com:3306/mpromonet" />
-	    <property name="username" value="mic672@msn.com" />
-	    <property name="password" value="mic672@msn.com" />
+	    <property name="driverClassName" value="${jdbc.driver}" />
+	    <property name="url" value="${jdbc.url}" />
+	    <property name="username" value="${jdbc.username}" />
+	    <property name="password" value="${jdbc.password}" />
 	</bean>
 
 	<camelContext id="camelContext" xmlns="http://camel.apache.org/schema/spring">
