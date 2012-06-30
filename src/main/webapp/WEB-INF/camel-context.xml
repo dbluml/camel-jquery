@@ -130,6 +130,18 @@
 		
 		<!-- servlet endpoint to datasource -->
 		<route>
+			<from uri="servlet:///count"/>
+			<setBody>
+				<constant>select count(*) from events</constant>
+			</setBody>			
+			<filter><simple>${header.where}</simple>
+				<setBody>
+					<simple>${body} where ${header.where}</simple>
+				</setBody>
+			</filter>			
+			<to uri="jdbc:datasource"/>
+		</route>
+		<route>
 			<from uri="servlet:///values"/>
 			<setBody>
 				<constant>select * from events</constant>
