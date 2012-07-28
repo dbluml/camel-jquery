@@ -1,24 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0">
 	<!-- map file ressources -->
-	<filter>
-		<filter-name>examplePortal</filter-name>
-		<filter-class>org.apache.wicket.protocol.http.WicketFilter</filter-class>
-		<init-param>
-		<param-name>applicationClassName</param-name>
-		<param-value>test.GaeWicketApplication</param-value>
-		</init-param>
-	</filter>
-	<filter-mapping>
-		<filter-name>examplePortal</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
+     	<servlet>
+		<servlet-name>dispatcher</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+     	</servlet> 
+	<servlet-mapping>
+        	<servlet-name>dispatcher</servlet-name>
+        	<url-pattern>/</url-pattern>
+	</servlet-mapping>
   
 	<!-- map camel servlet -->
 	<servlet>
 		<servlet-name>CamelServlet</servlet-name>
 		<servlet-class>org.apache.camel.component.servlet.CamelHttpTransportServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
 	</servlet>	 
 	<servlet-mapping>
 		<servlet-name>CamelServlet</servlet-name>
@@ -31,7 +26,7 @@
 	</listener>
 	<context-param>
 	    <param-name>contextConfigLocation</param-name>
-	    <param-value>WEB-INF/camel-context.xml</param-value>
+	    <param-value>WEB-INF/*-context.xml</param-value>
 	</context-param>
 			
 </web-app>

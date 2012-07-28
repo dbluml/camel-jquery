@@ -32,7 +32,7 @@
 
 		<!-- process data -->
 		<route>
-			<from uri="timer://default?period=5000"/>
+			<from uri="timer://default?period=50000"/>
 			<to uri="direct:query"/>
 		</route>
 		<route>
