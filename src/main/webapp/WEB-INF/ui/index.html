@@ -1,9 +1,58 @@
 <html>
+<!-- jquery -->
+<script type="text/javascript" src="jquery/js/jquery-1.7.2.min.js"></script>
+<!-- jquery ui -->
+<link type="text/css" href="jquery/css/black-tie/jquery-ui-1.8.22.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="jquery/js/jquery-ui-1.8.22.custom.min.js"></script>
+<script type="text/javascript" src="jquery/js/i18n/grid.locale-en.js" ></script>
+<!-- jquery ui jqgrid -->
+<link type="text/css" href="jquery/css/ui.jqgrid.css" rel="stylesheet" />
+<script type="text/javascript" src="jquery/js/jquery.jqGrid.min.js" ></script>
+<!--  -->
+<script type="text/javascript">
+	jQuery().ready(function (){ 
+		var colModel=[ 
+				{name:'Field',index:'Field' }, 
+				{name:'Type',index:'Type' }, 
+				{name:'Null',index:'Null' }, 
+				{name:'Default',index:'Default' }, 
+				{name:'Extra',index:'Extra' } 
+		];
+		$.get("/camel/schema", "",function(data) { LoadDataIntoGrid("schema",data, colModel); } , "text" );	
+		
+		var colValueModel=[ 
+				{name:'id',index:'id' }, 
+				{name:'msg',index:'msg' }, 
+		];
+		$.get("/camel/values?limit=50", "",function(data) { LoadDataIntoGrid("values",data, colValueModel); } , "text" );		
+	})
+	
+	function LoadDataIntoGrid(listName,result,colModel) {
+		$("#"+ listName).jqGrid({ 
+			width: "800",
+			datatype: "local", 
+			colModel: colModel,
+			pager: jQuery("#"+ listName+"_pager")
+		});
+		
+		// ugly transmormation from serialize map<string> to json
+		result = result.replace(/=([^,}]*),/g,":\"$1\"," ); 
+		result = result.replace(/=([^,}]*)}/g,":\"$1\"}" ); 
+		var object = eval ( "(" + result +")" );
+		
+		// append data
+		for(var i=0;i<=object.length;i++) 
+		{
+			$("#"+ listName).jqGrid('addRowData',i+1,object[i]);
+		}
+	}
+
+</script>
 <body>
 	<a href="/camel/hello">Hello Camel</a><br>
 	<br>
 	<a href="/camel/count">select count(*) from events</a><br>
-	<a href="/camel/value">select * from events</a><br>
+	<a href="/camel/values?limit=50">select * from events</a><br>
 	<a href="/camel/schema">describe events</a><br>
 	<a href="/camel/droptable">droptable</a><br>
 	<a href="/camel/createtable">createtable</a><br>
@@ -15,5 +64,14 @@
 	<a href="/camel/getStationList?line=B194">ligne 194</a><br>
 	<a href="/camel/getNextTime?line=B295">Bus sur la ligne 295</a><br>
 	<a href="/camel/getNextTime?line=B194">Bus sur la ligne 194</a><br>
+	
+	<br>Database Schema
+	<table id="schema"></table> 
+	<div id="schema_pager"></div>
+	
+	<br>Database Items
+	<table id="values"></table> 
+	<div id="values_pager"></div>
+		
 </body>
 </html>

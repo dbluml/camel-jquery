@@ -107,6 +107,7 @@
 			<removeHeaders pattern="CamelHttp*"/>
 			<setHeader headerName="CamelHttpMethod"><constant>POST</constant></setHeader>			
 			<setBody><simple>busLigneServiceForm%5Bline%5D=${header.line}&amp;busLigneServiceForm%5Bservice%5D=PP</simple></setBody>			
+			<to uri="log:==========?showHeaders=true&amp;multiline=true"/>
 			<to uri="http://www.ratp.fr/horaires/fr/ratp/bus"/>
 			<unmarshal>
 				<tidyMarkup/>
@@ -149,6 +150,11 @@
 			<filter><simple>${header.where}</simple>
 				<setBody>
 					<simple>${body} where ${header.where}</simple>
+				</setBody>
+			</filter>			
+			<filter><simple>${header.limit}</simple>
+				<setBody>
+					<simple>${body} LIMIT ${header.limit}</simple>
 				</setBody>
 			</filter>			
 			<to uri="jdbc:datasource"/>

@@ -7,6 +7,7 @@
 
 	<mvc:view-controller path="/" view-name="ui/index.html"/>
 	<mvc:resources mapping="/ui/**" location="/, WEB-INF/ui/" />
+	<mvc:resources mapping="/jquery/**" location="classpath:/jquery/" />
 	<mvc:default-servlet-handler />
 	
 </beans>	
