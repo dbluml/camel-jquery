@@ -200,6 +200,7 @@
 			<recipientList>
 				<header>target</header>
 			</recipientList>	
+			<to uri="log:==========?showHeaders=true"/>
 		</route>
 		<route>
 			<from uri="servlet:///getStationList"/>
