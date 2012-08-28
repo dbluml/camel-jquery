@@ -196,7 +196,7 @@
 		<route>
 			<from uri="servlet:///post"/>
 			<to uri="direct:getInfo"/>
-			<setHeader headerName="target"><simple>smtp://smtp.sendgrid.net?username=cloudbees_mpromonet&amp;password=mic672%40msn.com&amp;to=${header.to}&amp;subject=${header.subject}</simple></setHeader>
+			<setHeader headerName="target"><simple>smtp://smtp.sendgrid.net:587?username=cloudbees_mpromonet&amp;password=mic672%40msn.com&amp;to=${header.to}&amp;subject=${header.subject}</simple></setHeader>
 			<recipientList>
 				<header>target</header>
 			</recipientList>	
