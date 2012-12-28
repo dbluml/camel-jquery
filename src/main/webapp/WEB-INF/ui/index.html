@@ -18,13 +18,13 @@
 				{name:'Default',index:'Default' }, 
 				{name:'Extra',index:'Extra' } 
 		];
-		$.get("/camel/schema", "",function(data) { LoadDataIntoGrid("schema",data, colModel); } , "text" );	
+		$.get("camel/schema", "",function(data) { LoadDataIntoGrid("schema",data, colModel); } , "text" );	
 		
 		var colValueModel=[ 
 				{name:'id',index:'id' }, 
 				{name:'msg',index:'msg' }, 
 		];
-		$.get("/camel/values?limit=50", "",function(data) { LoadDataIntoGrid("values",data, colValueModel); } , "text" );		
+		$.get("camel/values?limit=50", "",function(data) { LoadDataIntoGrid("values",data, colValueModel); } , "text" );		
 	})
 	
 	function LoadDataIntoGrid(listName,result,colModel) {
@@ -49,21 +49,21 @@
 
 </script>
 <body>
-	<a href="/camel/hello">Hello Camel</a><br>
+	<a href="camel/hello">Hello Camel</a><br>
 	<br>
-	<a href="/camel/count">select count(*) from events</a><br>
-	<a href="/camel/values?limit=50">select * from events</a><br>
-	<a href="/camel/schema">describe events</a><br>
-	<a href="/camel/droptable">droptable</a><br>
-	<a href="/camel/createtable">createtable</a><br>
+	<a href="camel/count">select count(*) from events</a><br>
+	<a href="camel/values?limit=50">select * from events</a><br>
+	<a href="camel/schema">describe events</a><br>
+	<a href="camel/droptable">droptable</a><br>
+	<a href="camel/createtable">createtable</a><br>
 	<br>
-	<a href="/camel/get">Pierrelais</a><br>
-	<a href="/camel/post?to=aaaaaaaaaaaaaaaa@busapaname.appspotmail.com&subject=test">send mail</a><br>
+	<a href="camel/get">Pierrelais</a><br>
+	<a href="camel/post?to=aaaaaaaaaaaaaaaa@busapaname.appspotmail.com&subject=test">send mail</a><br>
 	<br>
-	<a href="/camel/getStationList?line=B295">ligne 295</a><br>
-	<a href="/camel/getStationList?line=B194">ligne 194</a><br>
-	<a href="/camel/getNextTime?line=B295">Bus sur la ligne 295</a><br>
-	<a href="/camel/getNextTime?line=B194">Bus sur la ligne 194</a><br>
+	<a href="camel/getStationList?line=B295">ligne 295</a><br>
+	<a href="camel/getStationList?line=B194">ligne 194</a><br>
+	<a href="camel/getNextTime?line=B295">Bus sur la ligne 295</a><br>
+	<a href="camel/getNextTime?line=B194">Bus sur la ligne 194</a><br>
 	
 	<br>Database Schema
 	<table id="schema"></table> 
