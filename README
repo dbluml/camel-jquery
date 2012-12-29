@@ -1,4 +1,0 @@
-mvn bee:run	run localy in embedded tomcat
-
-mvn bee:deploy	deploy to cloudbees to http://busapaname.mpromonet.cloudbees.net
-	
