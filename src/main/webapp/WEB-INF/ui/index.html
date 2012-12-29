@@ -28,11 +28,11 @@
 	})
 	
 	function LoadDataIntoGrid(listName,result,colModel) {
-		$("#"+ listName).jqGrid({ 
+		$("#"+ listName + "_table", top.frames["db"]).jqGrid({ 
 			width: "800",
 			datatype: "local", 
 			colModel: colModel,
-			pager: jQuery("#"+ listName+"_pager")
+			pager: jQuery("#"+ listName+"_pager", top.frames["db"])
 		});
 		
 		// ugly transmormation from serialize map<string> to json
@@ -43,35 +43,47 @@
 		// append data
 		for(var i=0;i<=object.length;i++) 
 		{
-			$("#"+ listName).jqGrid('addRowData',i+1,object[i]);
+			$("#"+ listName + "_table", top.frames["db"]).jqGrid('addRowData',i+1,object[i]);
 		}
 	}
 
 </script>
-<body>
-	<a href="camel/hello">Hello Camel</a><br>
-	<br>
-	<a href="camel/count">select count(*) from events</a><br>
-	<a href="camel/values?limit=50">select * from events</a><br>
-	<a href="camel/schema">describe events</a><br>
-	<a href="camel/droptable">droptable</a><br>
-	<a href="camel/createtable">createtable</a><br>
-	<br>
-	<a href="camel/get">Pierrelais</a><br>
-	<a href="camel/post?to=aaaaaaaaaaaaaaaa@busapaname.appspotmail.com&subject=test">send mail</a><br>
-	<br>
-	<a href="camel/getStationList?line=B295">ligne 295</a><br>
-	<a href="camel/getStationList?line=B194">ligne 194</a><br>
-	<a href="camel/getNextTime?line=B295">Bus sur la ligne 295</a><br>
-	<a href="camel/getNextTime?line=B194">Bus sur la ligne 194</a><br>
+<script>
+function init() 
+{
+	parent.toc.document.open();
+	parent.toc.document.write('<p><A target=content href="camel/hello" target=content >Hello Camel</A></p>');
+	parent.toc.document.write('<br>');
+	parent.toc.document.write('<p><a target=content href="camel/count">select count(*) from events</a></p>');
+	parent.toc.document.write('<p><a target=content href="camel/values?limit=50">select * from events</a></p>');
+	parent.toc.document.write('<p><a target=content href="camel/schema">describe events</a></p>');
+	parent.toc.document.write('<p><a target=content href="camel/droptable">droptable</a></p>');
+	parent.toc.document.write('<p><a target=content href="camel/createtable">createtable</a></p>');
+	parent.toc.document.write('<br>');
+	parent.toc.document.write('<p><a target=content href="camel/get">get</a></p>');
+	parent.toc.document.write('<p><a target=content href="camel/post?to=aaaaaaaaaaaaaaaa@busapaname.appspotmail.com&subject=test">send mail</a></p>');
+	parent.toc.document.write('<br>');
+	parent.toc.document.write('<p><a target=content href="camel/getStationList?line=B295">ligne 295</a></p>');
+	parent.toc.document.write('<p><a target=content href="camel/getStationList?line=B194">ligne 194</a></p>');
+	parent.toc.document.write('<p><a target=content href="camel/getNextTime?line=B295">Bus sur la ligne 295</a></p>');	
+	parent.toc.document.write('<p><a target=content href="camel/getNextTime?line=B194">Bus sur la ligne 194</a></p>');	
+	parent.toc.document.close();
 	
-	<br>Database Schema
-	<table id="schema"></table> 
-	<div id="schema_pager"></div>
-	
-	<br>Database Items
-	<table id="values"></table> 
-	<div id="values_pager"></div>
-		
-</body>
+	parent.db.document.open();
+	parent.db.document.write('<p>Database Schema</p>');
+	parent.db.document.write('<table id="schema_table"></table>');
+	parent.db.document.write('<div id="schema_pager"></div>');
+	parent.db.document.write('<br>');
+	parent.db.document.write('<p>Database Items</p>');
+	parent.db.document.write('<table id="values_table"></table>');
+	parent.db.document.write('<div id="values_pager"></div>');
+	parent.db.document.close();
+} 
+</script>
+<FRAMESET cols="30%,40%,30%" >
+	<FRAME NAME="toc" onload='init();'>
+	<FRAME NAME="content">
+	<FRAME NAME="db">
+</FRAMESET> 
+<body/>
 </html>

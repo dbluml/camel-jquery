@@ -30,11 +30,15 @@
 			<setBody><simple>Hello Camel</simple></setBody>
 		</route>
 
-		<!-- process data -->
+		<!-- cyclic task -->
 		<route>
 			<from uri="timer://default?period=50000"/>
 			<to uri="direct:query"/>
+			<to uri="direct:getInfo"/>
+			<to uri="direct:insert"/>
 		</route>
+
+		<!-- process data -->
 		<route>
 			<from uri="direct:query"/>
 			<to uri="direct:clear"/>
@@ -66,12 +70,18 @@
 		</route>
 		<route>
 			<from uri="direct:fetchURL"/>
-			<setHeader headerName="target"><simple>${body}</simple></setHeader>
-			<recipientList>
-				<header>target</header>
-			</recipientList>				
-			<to uri="direct:extractData"/>
-			<to uri="direct:concatData"/>
+			<doTry>
+				<setHeader headerName="target"><simple>${body}?throwExceptionOnFailure=false&amp;httpClient.connectionManagerTimeout=1000&amp;httpClient.soTimeout=1000</simple></setHeader>
+				<recipientList>
+					<header>target</header>
+				</recipientList>				
+				<to uri="direct:extractData"/>
+				<to uri="direct:concatData"/>
+				<doCatch>
+					<exception>java.lang.Exception</exception>
+					<to uri="log:exception"/>
+				</doCatch>
+			</doTry>			
 		</route>
 		<route>
 			<from uri="direct:extractData"/>
@@ -92,9 +102,9 @@
 		</route>
 		<route>
 			<from uri="direct:concatData"/>
-			<to uri="direct:insert"/>
 			<setBody><simple>${bean:dataSet?method=getDefaultBody}${body}</simple></setBody>
 			<bean ref="dataSet" method="setDefaultBody"/>
+			<to uri="log:concatData"/>
 		</route>
 		<route>
 			<from uri="direct:getInfo"/>
@@ -196,8 +206,7 @@
 		<route>
 			<from uri="servlet:///post"/>
 			<to uri="direct:getInfo"/>
-			<setHeader headerName="target"><simple>smtp://smtp.sendgrid.net:587?username=cloudbees_mpr&amp;to=${header.to}&amp;subject=${header.subject}&amp;debugMode=true</simple></setHeader>
-			<to uri="log:==========?showHeaders=true"/>
+			<setHeader headerName="target"><simple>smtps://smtp.sendgrid.net:587?username=cloudbees_mpr&amp;to=${header.to}&amp;subject=${header.subject}&amp;debugMode=true&amp;mail.smtp.auth.mechanisms=PLAIN</simple></setHeader>
 			<recipientList>
 				<header>target</header>
 			</recipientList>	
@@ -218,7 +227,8 @@
 			<to uri="direct:clear"/>
 			<to uri="direct:getStationList"/>
 			<split>
-				<xpath>//item/@key</xpath>
+				<xpath>//item</xpath>
+				<setBody><xpath resultType="java.lang.String">item/@key</xpath></setBody>	
 				<setBody><simple>http://www.ratp.fr/horaires/fr/ratp/bus/prochains_passages/PP/${header.line}/${body}/A</simple></setBody>			
 				<to uri="direct:fetchURL"/>
 			</split>
