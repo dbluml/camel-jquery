@@ -1,13 +1,14 @@
 Camel-JQuery
 --------------------
-
+Use Camel to query http server, extract data, use jdbc to write in database.
+Use JQuery-UI to present data.
 
 Links
 ------------
-mvn               : run localy in embedded tomcat
-mvn deploy    : deploy to github
-mvn package : build webapp
-....
+-mvn               : run localy in embedded tomcat
+-mvn package : build webapp
+-mvn deploy    : deploy to github
+-....
 
 Links
 ------------
